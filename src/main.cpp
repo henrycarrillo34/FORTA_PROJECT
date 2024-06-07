@@ -19,12 +19,13 @@
 //*************************
 //      PINOUT
 //*************************
-//---TX2-RX2 (Debug- Watimetro)
+//---TX2-RX2 (Watimetro)
 #define RXp2 16
 #define TXp2 17
-//---TX3-RX3 (STM32)
+//---TX3-RX3 (DEBUG)
 #define RX3 (13)
 #define TX3 (12)
+//--LED ESP32
 int LED = 2; 
 
 //*************************
@@ -52,21 +53,14 @@ int16_t potencia;
 int16_t voltaje;
 int16_t energia; 
 
-//OTRA FUNCION PARA CONVERTIR DE HEXADECIMAL A FLOTANTE
-float ieee_float(uint32_t f)
-{
-    static_assert(sizeof(float) == sizeof f, "float has a weird size.");
-    float ret;
-    std::memcpy(&ret, &f, sizeof(float));
-    return ret;
-}
 
-
-unsigned long timerDelay_0 = 1000;
-unsigned long timerDelay_wifi = 5000;
-unsigned long lastTime_0 = 0;   // para millis()
 
 void setup() {
+  //TERMINAL RX0-TX0 -> SIM808
+  Serial.begin(9600);
+  //TERMINAL RX2-TX2 -> WATIMETRO
+  Serial2.begin(115200, SERIAL_8N1, RXp2, TXp2); //Dispositivo de bajada
+
   pinMode(MAX485_DE, OUTPUT);
   Serial2.begin(9600);
   Serial.begin(9600);
