@@ -53,17 +53,44 @@ int16_t potencia;
 int16_t voltaje;
 int16_t energia; 
 
+String servidor = "http://869c-38-25-16-250.sa.ngrok.io/api/lecturas/crearPorSerie/IM001";
 
+//***********************
+//   GSM
+void comandosAT()
+{
+  Serial2.println("AT+HTTPINIT");
+  delay(50);
+  Serial2.println("AT+HTTPPARA=\"URL\",\""+servidor+"\""); //Server address
+  delay(25);
+  Serial2.println("AT+HTTPPARA=\"CONTENT\",\"application/json\"");
+  delay(25);
+  Serial2.println("AT+HTTPDATA=" + String(json.length())  + ",1000");
+  delay(50);
+  Serial2.println(json);
+  delay(300);
+  json="";
+  Serial2.println("AT+HTTPACTION=1");
+  delay(25);
+  Serial2.println("AT+HTTPTERM");
+  delay(50);
+  while(Serial2.available()!=0){/* If data is available on serial port */
+    //Serial.write(char (Serial.read()));
+    String cadena = Serial2.readString() ; 
+    U3_Debug.println(cadena); //UART3
+  }
+}
 
 void setup() {
   //TERMINAL RX0-TX0 -> SIM808
   Serial.begin(9600);
   //TERMINAL RX2-TX2 -> WATIMETRO
-  Serial2.begin(115200, SERIAL_8N1, RXp2, TXp2); //Dispositivo de bajada
-
+  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2); //Dispositivo de bajada
+  //TERMINAL RX3-TX3 -> TERMINAL
+  U3_Debug.begin(9600, SWSERIAL_8N1, RX3, TX3, false, 256); // BADURATE del software serial de comunicacion
+  // high speed half duplex, turn off interrupts during tx
+  U3_Debug.enableIntTx(false);
   pinMode(MAX485_DE, OUTPUT);
-  Serial2.begin(9600);
-  Serial.begin(9600);
   pinMode(led_esp32,OUTPUT);
 }
 
@@ -71,6 +98,11 @@ void setup() {
 
 
 void loop() {
-
-
+  //cadena_amb_json = cadena_amb ; 
+  doc["corriente"] = corriente;
+  doc["voltaje"] = voltaje;
+  doc["potencia"] = potencia;
+  doc["energia"] = potencia;
+  serializeJson(doc, json); 
+  comandosAT();
 }
