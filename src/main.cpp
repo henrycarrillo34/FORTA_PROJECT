@@ -149,11 +149,7 @@ void setup() {
 
 void loop() {
   if ( Serial2.available() > 0 ){
-
-
-
-  }
-  //cadena_amb_json = cadena_amb ; 
+//cadena_amb_json = cadena_amb ; 
   doc["corriente"] = corriente;
   doc["voltaje"] = voltaje;
   doc["potencia"] = potencia;
@@ -161,4 +157,8 @@ void loop() {
   serializeJson(doc, json); 
   comandos_red_AT();
   comandosAT_JSON();
+
+
+  }
+  
 }
